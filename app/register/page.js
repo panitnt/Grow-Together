@@ -1,20 +1,65 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
+import Swal from "sweetalert2";
+import { BeatLoader } from "react-spinners"; 
 
 const RegisterPage = () => {
-  const [name, setName] = useState("");
+  const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repassword, setRePassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handlerSubmit = async (e) => {
     e.preventDefault();
-    setError("")
-    if (password != repassword) {
+    setError("");
+    setLoading(true); // Start loading
+
+    if (password !== repassword) {
       setError("Password Not match!!!");
+      setLoading(false); // Stop loading if validation fails
       return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await res.json();
+      setLoading(false); // Stop loading after response
+
+      if (res.ok && data.success) {
+        const form = e.target;
+        form.reset();
+        Swal.fire({
+          title: "Success!",
+          text: data.message,
+          icon: "success",
+          confirmButtonText: "Close",
+        });
+      } else {
+        Swal.fire({
+          title: "Warning!",
+          text: data.message,
+          icon: "warning",
+          confirmButtonText: "Close",
+        });
+      }
+    } catch (error) {
+      setLoading(false); // Stop loading on error
+      Swal.fire({
+        title: "Error!",
+        text: error.message || "Something went wrong!",
+        icon: "error",
+        confirmButtonText: "Close",
+      });
     }
   };
 
@@ -32,7 +77,7 @@ const RegisterPage = () => {
               Username
             </label>
             <input
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setUserName(e.target.value)}
               name="username"
               id="username"
               type="text"
@@ -41,6 +86,7 @@ const RegisterPage = () => {
               required
             />
           </div>
+
           <div className="pb-4">
             <label
               htmlFor="email"
@@ -58,6 +104,7 @@ const RegisterPage = () => {
               required
             />
           </div>
+
           <div className="pb-4">
             <label
               htmlFor="password"
@@ -75,6 +122,7 @@ const RegisterPage = () => {
               required
             />
           </div>
+
           <div className="pb-4">
             <label
               htmlFor="repassword"
@@ -92,19 +140,28 @@ const RegisterPage = () => {
               required
             />
           </div>
-          {error != "" ? (
+
+          {error && (
             <div className="text-sm text-red-700">
               <p>{error}</p>
             </div>
-          ) : (
-            ""
           )}
+
           <div className="flex flex-col items-center">
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+              className={`${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-700"
+              } text-white font-bold py-2 px-4 rounded-full flex items-center justify-center`}
+              disabled={loading} // Disable button during loading
             >
-              Register
+              {loading ? (
+                <BeatLoader size={10} color="#ffffff" loading={true} />
+              ) : (
+                "Register"
+              )}
             </button>
           </div>
         </form>
@@ -115,7 +172,7 @@ const RegisterPage = () => {
           </div>
           <div className="relative flex justify-center">
             <span className="bg-white px-4 text-sm text-gray-500">
-              If you already have account
+              If you already have an account
             </span>
           </div>
         </div>
