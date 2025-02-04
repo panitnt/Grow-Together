@@ -40,22 +40,37 @@ const authOptions = {
   },
 
   callbacks: {
+    async signIn({ user, account, profile }) {
+      await connectMongoDB();
+
+      if (account.provider === "google") {
+        const existingUser = await User.findOne({ email: profile.email });
+
+        // Save Google user if not already in the DB
+        if (!existingUser) {
+          await User.create({
+            username: profile.name,
+            email: profile.email,
+            provider: "google",
+          });
+        }
+      }
+
+      return true; // Allow sign-in
+    },
+
     async jwt({ token, user, account, profile }) {
       if (account && user) {
         token.id = user.id;
         token.provider = account.provider;
-        if (account.provider === "google") {
-          token.username = profile.name; // Use Google profile name
-        } else {
-          token.username = user.username; // Use DB username for credentials login
-        }
+        token.username = user.username || profile?.name;
       }
       return token;
     },
 
     async session({ session, token }) {
       session.user.id = token.id;
-      session.user.username = token.username; // Add username to the session
+      session.user.username = token.username;
       return session;
     },
   },
