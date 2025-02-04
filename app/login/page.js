@@ -1,14 +1,46 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import { BeatLoader } from "react-spinners";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
+  const handlerSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+    try {
+      const res = await signIn("credentials", {
+        username,
+        password,
+        redirect: false,
+      }); // name same name as app/api/auth/[...nextauth]/route.js
+
+      if (res.error){
+        setError("Invalid Credentials")
+        setLoading(false)
+        return
+      }
+
+      router.replace("home")
+      setLoading(false)
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto">
       <h2 className="text-2xl py-4">Login Account</h2>
 
       <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md p-8 dark:bg-gray-800 dark:border-gray-700">
-        <form action={``}>
+        <form onSubmit={handlerSubmit}>
           <div className="pb-4">
             <label
               htmlFor="username"
@@ -17,6 +49,7 @@ const LoginPage = () => {
               Username
             </label>
             <input
+              onChange={(e) => setUsername(e.target.value)}
               name="username"
               id="username"
               type="text"
@@ -33,6 +66,7 @@ const LoginPage = () => {
               Password
             </label>
             <input
+              onChange={(e) => setPassword(e.target.value)}
               name="password"
               id="password"
               type="password"
@@ -41,12 +75,27 @@ const LoginPage = () => {
               required
             />
           </div>
+          {error && (
+            <div className="text-sm text-red-700">
+              <p>{error}</p>
+            </div>
+          )}
+
           <div className="flex flex-col items-center">
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+              className={`${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-700"
+              } text-white font-bold py-2 px-4 rounded-full flex items-center justify-center`}
+              disabled={loading} // Disable button during loading
             >
-              Login
+              {loading ? (
+                <BeatLoader size={10} color="#ffffff" loading={true} />
+              ) : (
+                "Register"
+              )}
             </button>
           </div>
         </form>
@@ -56,12 +105,16 @@ const LoginPage = () => {
             <div className="w-full border-b border-gray-300"></div>
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-white px-4 text-sm text-gray-500">If you don't have account</span>
+            <span className="bg-white px-4 text-sm text-gray-500">
+              If you don't have account
+            </span>
           </div>
         </div>
 
         <div className="flex flex-col items-center justify-center">
-          <Link href={`/register`} className="hover:text-blue-700">Register here</Link>
+          <Link href={`/register`} className="hover:text-blue-700">
+            Register here
+          </Link>
         </div>
       </div>
     </div>
