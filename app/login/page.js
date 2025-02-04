@@ -14,7 +14,7 @@ const LoginPage = () => {
   const router = useRouter();
   const handlerSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await signIn("credentials", {
         username,
@@ -22,17 +22,20 @@ const LoginPage = () => {
         redirect: false,
       }); // name same name as app/api/auth/[...nextauth]/route.js
 
-      if (res.error){
-        setError("Invalid Credentials")
-        setLoading(false)
-        return
+      if (res.error) {
+        setError("Invalid Credentials");
+        setLoading(false);
+        return;
       }
 
-      router.replace("home")
-      setLoading(false)
+      router.replace("home");
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
+  };
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/home" }); // Redirect after Google sign-in
   };
 
   return (
@@ -100,21 +103,38 @@ const LoginPage = () => {
           </div>
         </form>
 
-        <div className="relative py-4">
+        <div className="flex flex-col items-center justify-center py-4">
+          <span className="bg-white px-4 text-sm text-gray-500">
+            If you don't have account
+          </span>
+          <Link href={`/register`} className="hover:text-blue-700">
+            Register here
+          </Link>
+        </div>
+
+        <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-b border-gray-300"></div>
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-white px-4 text-sm text-gray-500">
-              If you don't have account
-            </span>
+            <span className="bg-white px-4 text-sm text-gray-500">or</span>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center">
-          <Link href={`/register`} className="hover:text-blue-700">
-            Register here
-          </Link>
+        <div className="pt-4">
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full text-blue-500 hover:text-white py-2 rounded flex items-center justify-center gap-2 hover:bg-blue-600"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/npm/simple-icons@7.17.0/icons/google.svg"
+              alt="Google Logo"
+              width={20}
+              height={20}
+              className="p-0.5" // Optional styling for better contrast
+            />
+            <span className="font-medium">Sign in with Google</span>
+          </button>
         </div>
       </div>
     </div>

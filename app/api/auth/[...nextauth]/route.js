@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectMongoDB } from "@/lib/mongodb";
 import User from "@/models/user";
@@ -6,52 +7,62 @@ import bcrypt from "bcryptjs";
 
 const authOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+
     CredentialsProvider({
       name: "credentials",
       credentials: {},
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         const { username, password } = credentials;
         try {
           await connectMongoDB();
-          const user = await User.findOne({ username: username });
+          const user = await User.findOne({ username });
 
-          if (!user) {
-            return null;
-          }
+          if (!user) return null;
 
           const passwordMatch = await bcrypt.compare(password, user.password);
+          if (!passwordMatch) return null;
 
-          if (!passwordMatch) {
-            return null;
-          }
           return user;
         } catch (error) {
           console.log(error);
+          return null;
         }
       },
     }),
   ],
+
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  pages: {
-    signIn: "/login",
-  },
+
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.username = user.username; // Add username to the JWT token
+    async jwt({ token, user, account, profile }) {
+      if (account && user) {
+        token.id = user.id;
+        token.provider = account.provider;
+        if (account.provider === "google") {
+          token.username = profile.name; // Use Google profile name
+        } else {
+          token.username = user.username; // Use DB username for credentials login
+        }
       }
       return token;
     },
+
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.username = token.username; // Add username to the session
-      }
+      session.user.id = token.id;
+      session.user.username = token.username; // Add username to the session
       return session;
     },
   },
+  pages: {
+    signIn: "/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
