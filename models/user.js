@@ -19,6 +19,10 @@ const userSchema = new Schema(
             require: true,
             default: "user"
         },
+        provider: { 
+            type: String, 
+            default: "credentials" 
+        },
     }, 
     {timestamps: true}
 )

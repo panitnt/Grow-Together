@@ -28,6 +28,7 @@ export async function POST(req) {
       username: username,
       email: email,
       password: hashedPassword,
+      provider: "growtogether"
     });
 
     return NextResponse.json({ success:true,  message: "Register already!" }, { status: 201 });
