@@ -15,6 +15,7 @@ const LoginPage = () => {
   const handlerSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const res = await signIn("credentials", {
         username,
@@ -22,8 +23,8 @@ const LoginPage = () => {
         redirect: false,
       }); // name same name as app/api/auth/[...nextauth]/route.js
 
-      if (res.error) {
-        setError("Invalid Credentials");
+      if (res?.error) {
+        setError(res?.error);
         setLoading(false);
         return;
       }
@@ -97,7 +98,7 @@ const LoginPage = () => {
               {loading ? (
                 <BeatLoader size={10} color="#ffffff" loading={true} />
               ) : (
-                "Register"
+                "Login"
               )}
             </button>
           </div>

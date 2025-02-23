@@ -9,13 +9,13 @@ export async function POST(req) {
 
     const { username, email, password } = await req.json();
 
-    const checkUsername = await User.exists({ username: username });
+    // const checkUsername = await User.exists({ username: username });
     // console.log(checkUsername);
     const existingUser = await User.findOne({
         $or: [{ username: username }, { email: email }],
       });
 
-    if (checkUsername) {
+    if (existingUser) {
       return NextResponse.json(
           { success: false, message: "Username/Email Already exits" },
           { status: 200 },

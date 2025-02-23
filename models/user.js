@@ -1,4 +1,5 @@
 import mongoose, {Schema} from "mongoose";
+import Room from "./room";
 
 const userSchema = new Schema(
     {

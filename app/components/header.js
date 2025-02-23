@@ -42,11 +42,13 @@ const Header = () => {
             About
           </Link>
           <Link href="#" className="text-gray-900 dark:text-white hover:text-blue-500">
-            Services
+            Tutor
           </Link>
           <Link href="#" className="text-gray-900 dark:text-white hover:text-blue-500">
-            Pricing
+            Sharing
           </Link>
+
+          <p>|</p>
 
           {session ? (
             <div className="flex items-center space-x-4">

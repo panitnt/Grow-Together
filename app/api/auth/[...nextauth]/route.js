@@ -21,15 +21,20 @@ const authOptions = {
           await connectMongoDB();
           const user = await User.findOne({ username });
 
-          if (!user) return null;
+          if (!user) {
+            throw new Error("Don't have an account yet, please sign up.");
+          };
 
           const passwordMatch = await bcrypt.compare(password, user.password);
-          if (!passwordMatch) return null;
+          if (!passwordMatch){
+            throw new Error("Invalid username or password.");
+
+          };
 
           return user;
         } catch (error) {
           console.log(error);
-          return null;
+          throw new Error(error.message);
         }
       },
     }),

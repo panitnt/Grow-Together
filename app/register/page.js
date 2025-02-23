@@ -2,7 +2,8 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { BeatLoader } from "react-spinners"; 
+import { BeatLoader } from "react-spinners";
+import { signIn } from "next-auth/react";
 
 const RegisterPage = () => {
   const [username, setUserName] = useState("");
@@ -38,12 +39,22 @@ const RegisterPage = () => {
       if (res.ok && data.success) {
         const form = e.target;
         form.reset();
-        Swal.fire({
+
+        const result = await Swal.fire({
           title: "Success!",
           text: data.message,
           icon: "success",
           confirmButtonText: "Close",
         });
+
+        if (result.isConfirmed) {
+          await signIn("credentials", {
+            redirect: true,
+            username: username,
+            password: password,
+            callbackUrl: "/",
+          });
+        }
       } else {
         Swal.fire({
           title: "Warning!",
