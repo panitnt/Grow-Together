@@ -10,7 +10,7 @@ const Page = () => {
   
     useEffect(() => {
       if (status === "unauthenticated") {
-        router.push("/");
+        router.push("/login");
       }
     }, [status, router]);
     

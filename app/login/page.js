@@ -29,14 +29,14 @@ const LoginPage = () => {
         return;
       }
 
-      router.replace("home");
+      router.replace("/");
       setLoading(false);
     } catch (error) {
       console.log(error);
     }
   };
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/home" }); // Redirect after Google sign-in
+    signIn("google", { callbackUrl: "/" }); // Redirect after Google sign-in
   };
 
   return (

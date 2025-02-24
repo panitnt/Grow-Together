@@ -38,14 +38,17 @@ const Header = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex md:items-center space-x-6">
-          <Link href="#" className="text-gray-900 dark:text-white hover:text-blue-500">
-            About
+          <Link href="/room" className="text-gray-900 dark:text-white hover:text-blue-500">
+            Room
           </Link>
-          <Link href="#" className="text-gray-900 dark:text-white hover:text-blue-500">
+          <Link href="/room/tutor" className="text-gray-900 dark:text-white hover:text-blue-500">
             Tutor
           </Link>
-          <Link href="#" className="text-gray-900 dark:text-white hover:text-blue-500">
+          <Link href="/room/sharing" className="text-gray-900 dark:text-white hover:text-blue-500">
             Sharing
+          </Link>
+          <Link href="/about" className="text-gray-900 dark:text-white hover:text-blue-500">
+            About
           </Link>
 
           <p>|</p>
@@ -78,18 +81,23 @@ const Header = () => {
         <div className="md:hidden bg-gray-50 dark:bg-gray-800 shadow-lg rounded-b-lg">
           <ul className="flex flex-col items-start p-4 space-y-4">
             <li>
-              <Link href="#" className="block text-gray-900 dark:text-white hover:text-blue-500">
+              <Link href="/room" className="text-gray-900 dark:text-white hover:text-blue-500">
+                Room
+              </Link>
+            </li>
+            <li>
+              <Link href="/room/tutor" className="text-gray-900 dark:text-white hover:text-blue-500">
+                Tutor
+              </Link>
+            </li>
+            <li>
+              <Link href="/room/sharing" className="text-gray-900 dark:text-white hover:text-blue-500">
+                Sharing
+              </Link>
+            </li>
+            <li>
+              <Link href="/about" className="text-gray-900 dark:text-white hover:text-blue-500">
                 About
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="block text-gray-900 dark:text-white hover:text-blue-500">
-                Services
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="block text-gray-900 dark:text-white hover:text-blue-500">
-                Pricing
               </Link>
             </li>
 
