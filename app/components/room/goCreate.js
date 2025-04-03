@@ -26,7 +26,7 @@ const GoCreate = () => {
         <div className="relative">
           <div className="bg-blue-100 rounded-lg p-6 shadow-lg">
             <img
-              src="/images/illustration.png"
+              src="/images/Study.jpeg"
               alt="Illustration"
               className="w-full max-w-xs mx-auto"
             />

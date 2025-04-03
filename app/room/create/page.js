@@ -3,40 +3,79 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import { redirect } from 'next/navigation'
+
 
 const Page = () => {
-  const [roomName, setRoomName] = useState("")
-  const [roomtype, setRoomType] = useState("")
-  const [roomDescription, setRoomDescription] = useState("")
-  const [roomDate, setRoomDate] = useState("")
+  const [roomName, setRoomName] = useState("");
+  const [roomType, setRoomType] = useState("sharing");
+  const [roomDescription, setRoomDescription] = useState("");
+  const [roomDate, setRoomDate] = useState("");
+  const [roomTime, setRoomTime] = useState("");
+  const [roomPerson, setRoomPerson] = useState(100);
 
+  const { data: session } = useSession();
+  const userRole = session?.user?.role || "user";
+  const router = useRouter();
+  
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const handlerSubmit = async () => {
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const handlerSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true); // Start loading
 
-    if (password !== repassword) {
-      setError("Password Not match!!!");
-      setLoading(false); // Stop loading if validation fails
-      return;
-    }
-
+    const combinedDateTime = new Date(`${roomDate}T${roomTime}`);
+    
     try {
-      const res = await fetch(`hhttp://localhost:3000/api/room/create`, {
+      const res = await fetch(`http://localhost:3000/api/room/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({
+          name: roomName,
+          type: roomType,
+          description: roomDescription,
+          date: combinedDateTime.toISOString(),
+          person: roomPerson
+        }),
       });
 
       const data = await res.json();
-      setLoading(false); // Stop loading after response
-    } catch(err){
+      console.log(data);      
 
+      if (res.ok){
+        const form = e.target;
+        form.reset();
+
+        const result = await Swal.fire({
+          title: "Success!",
+          text: data.message,
+          icon: "success",
+          confirmButtonText: "Close",
+        });
+
+        if (result.isConfirmed) {
+          router.push('/room');
+        }
+      }
+      
+      setLoading(false); // Stop loading after response
+    } catch (err) {
+      setLoading(false); // Stop loading on error
+      Swal.fire({
+        title: "Error!",
+        text: err.message || "Something went wrong!",
+        icon: "error",
+        confirmButtonText: "Close",
+      });
     }
   };
 
@@ -55,8 +94,8 @@ const Page = () => {
             </label>
             <input
               onChange={(e) => {
-                console.log(e.target.value)
-                setRoomName(e.target.value)
+                // console.log(e.target.value);
+                setRoomName(e.target.value);
               }}
               name="roomname"
               id="roomname"
@@ -78,13 +117,15 @@ const Page = () => {
               id="roomtype"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               defaultValue="sharing"
-              onChange={(e)=>{
-                console.log(e.target.value)
-                setRoomType(e.target.value)
+              onChange={(e) => {
+                // console.log(e.target.value);
+                setRoomType(e.target.value);
               }}
             >
               <option value="sharing">sharing</option>
-              <option value="tutor">tutor</option>
+              <option value="tutor" disabled={userRole !== "tutor"}>
+                Tutor {userRole !== "tutor" ? "(Only for tutors)" : ""}
+              </option>
             </select>
           </div>
 
@@ -100,6 +141,10 @@ const Page = () => {
               rows="4"
               className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Write your thoughts here..."
+              onChange={(e) => {
+                // console.log(e.target.value);
+                setRoomDescription(e.target.value);
+              }}
             ></textarea>
           </div>
 
@@ -127,7 +172,12 @@ const Page = () => {
                 type="date"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Select date"
-                onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => {
+                  // console.log(e.target.value)
+                  setRoomDate(e.target.value)
+                }}
+                min={today}
+                required
               />
             </div>
           </div>
@@ -160,7 +210,10 @@ const Page = () => {
                 className="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 min="00:00"
                 max="23:59"
-                onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => {
+                  // console.log(e.target.value)
+                  setRoomTime(e.target.value)
+                }}
                 required
               />
             </div>
@@ -174,11 +227,15 @@ const Page = () => {
               Number of person
             </label>
             <input
-              onChange={(e) => console.log(e.target.value)}
+              onChange={(e) => {
+                // console.log(e.target.value)
+                setRoomPerson(parseInt(e.target.value))
+              }}
               name="roomperson"
               id="roomperson"
               type="number"
               placeholder="Enter room name"
+              defaultValue={100}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             />
           </div>

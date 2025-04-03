@@ -42,6 +42,8 @@ const authOptions = {
 
   session: {
     strategy: "jwt",
+    maxAge: 2 * 60 * 60, // 2hours
+    updateAge: 0,
   },
 
   callbacks: {
@@ -69,6 +71,7 @@ const authOptions = {
         token.id = user.id;
         token.provider = account.provider;
         token.username = user.username || profile?.name;
+        token.role = user.role;
       }
       return token;
     },
@@ -76,6 +79,7 @@ const authOptions = {
     async session({ session, token }) {
       session.user.id = token.id;
       session.user.username = token.username;
+      session.user.role = token.role;
       return session;
     },
   },

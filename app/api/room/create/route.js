@@ -37,7 +37,7 @@ export async function POST(req) {
       name,
       type,
       description,
-      date,
+      date: new Date(date),
       person,
     });
 

@@ -2,7 +2,7 @@ import RoomCard from "./roomCard";
 
 const RoomCardCollection = async (props) => {
   const roomType = props.roomtype;
-  const endPath = "";
+  let endPath = "";
   if (roomType) {
     endPath = `/${roomType}`;
   }
@@ -12,16 +12,16 @@ const RoomCardCollection = async (props) => {
 
   const body = await res.json();
   const rooms = body.data;
-  console.log(rooms);
+  // console.log(rooms);
 
   return (
     // <div className='grid sm:grid-cols-1 mobile:grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-3 desktop:grid-cols-4 gap-8'>
     <div className="p-8">
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        {rooms.map((room, ind) => (
+        {rooms.map((room) => (
           <RoomCard
-            key={ind}
-            id={ind}
+            key={room._id}
+            id={room._id}
             name={room.name}
             description={room.description}
             date={room.date}

@@ -1,13 +1,16 @@
+import Link from "next/link";
+
 const RoomCard = (props) => {
   // console.log(props.id);
   const name = props.name;
   const description = props.description;
   const roomtype = props.roomtype;
   const date = new Date(props.date)  
+  const roomID = props.id
 
   return (
     <div className="rounded-lg overflow-hidden shadow-lg">
-      <a href="">
+      <Link href={`/room/${roomID}`}>
         <div className="px-6 py-4">
           <p className="text-xl">{name}</p>
           <p className="text-gray-700 text-base">
@@ -27,9 +30,9 @@ const RoomCard = (props) => {
             {roomtype}
           </span>
         </div>
-      </a>
+      </Link>
     </div>
-  );
-};
+  )
+}
 
 export default RoomCard;
