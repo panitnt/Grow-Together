@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { redirect } from 'next/navigation'
-
+import { redirect } from "next/navigation";
 
 const Page = () => {
   const [roomName, setRoomName] = useState("");
@@ -17,10 +16,21 @@ const Page = () => {
   const [roomTime, setRoomTime] = useState("");
   const [roomPerson, setRoomPerson] = useState(100);
 
-  const { data: session } = useSession();
-  const userRole = session?.user?.role || "user";
+  const { data: session, status } = useSession();
   const router = useRouter();
-  
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  // const userRole = session?.user?.role || "user";
+  const userRole = session?.user?.role;
+  // console.log(session);
+
+  const userId = session?.user?.id;
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +42,7 @@ const Page = () => {
     setLoading(true); // Start loading
 
     const combinedDateTime = new Date(`${roomDate}T${roomTime}`);
-    
+
     try {
       const res = await fetch(`http://localhost:3000/api/room/create`, {
         method: "POST",
@@ -44,14 +54,15 @@ const Page = () => {
           type: roomType,
           description: roomDescription,
           date: combinedDateTime.toISOString(),
-          person: roomPerson
+          person: roomPerson,
+          userID: userId,
         }),
       });
 
       const data = await res.json();
-      console.log(data);      
+      // console.log(data);
 
-      if (res.ok){
+      if (res.ok) {
         const form = e.target;
         form.reset();
 
@@ -63,10 +74,10 @@ const Page = () => {
         });
 
         if (result.isConfirmed) {
-          router.push('/room');
+          router.push("/room");
         }
       }
-      
+
       setLoading(false); // Stop loading after response
     } catch (err) {
       setLoading(false); // Stop loading on error
@@ -174,7 +185,7 @@ const Page = () => {
                 placeholder="Select date"
                 onChange={(e) => {
                   // console.log(e.target.value)
-                  setRoomDate(e.target.value)
+                  setRoomDate(e.target.value);
                 }}
                 min={today}
                 required
@@ -212,7 +223,7 @@ const Page = () => {
                 max="23:59"
                 onChange={(e) => {
                   // console.log(e.target.value)
-                  setRoomTime(e.target.value)
+                  setRoomTime(e.target.value);
                 }}
                 required
               />
@@ -229,7 +240,7 @@ const Page = () => {
             <input
               onChange={(e) => {
                 // console.log(e.target.value)
-                setRoomPerson(parseInt(e.target.value))
+                setRoomPerson(parseInt(e.target.value));
               }}
               name="roomperson"
               id="roomperson"
