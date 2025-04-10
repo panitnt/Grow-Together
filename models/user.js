@@ -5,19 +5,19 @@ const userSchema = new Schema(
     {
         username: {
             type: String,
-            require: true
+            required: true
         },
         email: {
             type: String,
-            require: true
+            required: true
         },
         password: {
             type: String,
-            require: true
+            required: false
         },
         role: {
             type: String,
-            require: true,
+            required: true,
             default: "user"
         },
         provider: { 
