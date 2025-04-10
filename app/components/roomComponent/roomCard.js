@@ -5,8 +5,8 @@ const RoomCard = (props) => {
   const name = props.name;
   const description = props.description;
   const roomtype = props.roomtype;
-  const date = new Date(props.date)  
-  const roomID = props.id
+  const date = new Date(props.date);
+  const roomID = props.id;
 
   return (
     <div className="rounded-lg overflow-hidden shadow-lg">
@@ -18,21 +18,26 @@ const RoomCard = (props) => {
               ? description.substring(0, 150) + "..."
               : description}
           </p>
-          <p>{date?date.toLocaleDateString("th-TH"):""} time: {date?date.toLocaleTimeString("th-TH", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false, // Use 24-hour format
-              timeZone: "Asia/Bangkok"
-            }) : ""}</p>
+          <p>
+            {date ? date.toLocaleDateString("th-TH") : ""} time:{" "}
+            {date
+              ? date.toLocaleTimeString("th-TH", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false, // Use 24-hour format
+                  timeZone: "Asia/Bangkok",
+                })
+              : ""}
+          </p>
         </div>
         <div className="px-6 pt-4 pb-2">
-          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold dark:bg-blue-900 dark:text-blue-200">
             {roomtype}
           </span>
         </div>
       </Link>
     </div>
-  )
-}
+  );
+};
 
 export default RoomCard;
