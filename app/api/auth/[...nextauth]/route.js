@@ -23,13 +23,12 @@ const authOptions = {
 
           if (!user) {
             throw new Error("Don't have an account yet, please sign up.");
-          };
+          }
 
           const passwordMatch = await bcrypt.compare(password, user.password);
-          if (!passwordMatch){
+          if (!passwordMatch) {
             throw new Error("Invalid username or password.");
-
-          };
+          }
 
           return user;
         } catch (error) {
@@ -59,8 +58,12 @@ const authOptions = {
             username: profile.name,
             email: profile.email,
             provider: "google",
+            role: "user",
           });
         }
+        user.id = existingUser._id.toString();
+        user.username = existingUser.username;
+        user.role = existingUser.role;
       }
 
       return true; // Allow sign-in

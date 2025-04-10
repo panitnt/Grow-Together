@@ -1,13 +1,14 @@
 import Room from "@/models/room";
 import { connectMongoDB } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
+import Attend from "@/models/attend";
 
 export async function POST(req) {
   try {
     // Connect to MongoDB
     await connectMongoDB();
 
-    const { name, type, description, date, person } = await req.json();
+    const { name, type, description, date, person, userID} = await req.json();
 
     // Basic validation checks
     if (!name || !type) {
@@ -40,10 +41,19 @@ export async function POST(req) {
       date: new Date(date),
       person,
     });
+    
+    // console.log(newRoom._id.toString());
+    const roomID = newRoom._id.toString()
+
+    const addAttend = await Attend.create({
+      user: userID, 
+      room: roomID,
+      withRole: "owner"
+    })
 
     // Return a success response with the created room data
     return NextResponse.json(
-      { message: "Room created successfully", data: newRoom },
+      { message: "Room created successfully", room: newRoom , attend: addAttend},
       { status: 201 }
     );
   } catch (error) {

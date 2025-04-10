@@ -7,7 +7,11 @@ export async function GET() {
   try {
     await connectMongoDB();
 
-    const rooms = await Room.find({});
+    const now = new Date();
+
+    const rooms = await Room.find({
+      date: { $gte: now }
+    });
 
     return NextResponse.json(
       { message: "Rooms fetched successfully", data: rooms },
